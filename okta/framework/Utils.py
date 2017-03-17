@@ -7,7 +7,7 @@ import inspect
 
 class Utils(object):
     @staticmethod
-    def deserialize(from_data, to_class, extendAttributes):
+    def deserialize(from_data, to_class, extendAttributes=None):
 
         def custom_setattr(o, a, v):
             if hasattr(o, 'alt_names') and a in o.alt_names:
