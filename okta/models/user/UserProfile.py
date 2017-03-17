@@ -7,7 +7,7 @@ class UserProfile:
         'firstName': str,
         'lastName': str,
         'mobilePhone': str,
-	'countryCode': str
+	    'countryCode': str
     }
 
     def __init__(self):

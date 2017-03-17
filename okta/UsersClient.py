@@ -18,7 +18,7 @@ class UsersClient(ApiClient):
 
     # CRUD
 
-    def get_users(self, limit=None, query=None, filter_string=None):
+    def get_users(self, limit=None, query=None, filter_string=None, extended_attribute=None):
         """Get a list of Users
 
         :param limit: maximum number of users to return
@@ -35,9 +35,9 @@ class UsersClient(ApiClient):
             'filter': filter_string
         }
         response = ApiClient.get_path(self, '/', params=params)
-        return Utils.deserialize(response.text, User)
+        return Utils.deserialize(response.text, User, extended_attribute)
 
-    def get_user(self, uid):
+    def get_user(self, uid, extended_attribute=None):
         """Get a single user
 
         :param uid: the user id or login
@@ -45,7 +45,7 @@ class UsersClient(ApiClient):
         :rtype: User
         """
         response = ApiClient.get_path(self, '/{0}'.format(uid))
-        return Utils.deserialize(response.text, User)
+        return Utils.deserialize(response.text, User, extended_attribute)
 
     def update_user(self, user):
         """Update a user

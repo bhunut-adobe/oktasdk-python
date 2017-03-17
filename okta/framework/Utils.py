@@ -5,10 +5,9 @@ import types
 import six
 import inspect
 
-
 class Utils(object):
     @staticmethod
-    def deserialize(from_data, to_class):
+    def deserialize(from_data, to_class, extendAttributes):
 
         def custom_setattr(o, a, v):
             if hasattr(o, 'alt_names') and a in o.alt_names:
@@ -28,17 +27,25 @@ class Utils(object):
         if isinstance(json_dump, list_type):
             obj_list = list()
             for obj in json_dump:
-                obj_list.append(Utils.deserialize(obj, to_class))
+                obj_list.append(Utils.deserialize(obj, to_class, extendAttributes))
 
             return obj_list
 
         else:
             obj = to_class()
 
+            #Add additional type to obj object class from extendAttributes parameter.
+            if extendAttributes != None:
+                for key, value in extendAttributes.iteritems():
+                    if key not in obj.types and key in json_dump:
+                        obj.types.update({key:value})
+
             # Loop through each type of object in types
             if hasattr(to_class, 'types'):
+
                 for attr, attr_type in six.iteritems(to_class.types):
                     if attr in json_dump:
+
                         val = json_dump[attr]
 
                         if not val:
@@ -51,7 +58,7 @@ class Utils(object):
                             pass
 
                         else:
-                            val = Utils.deserialize(val, attr_type)
+                            val = Utils.deserialize(val, attr_type, extendAttributes)
 
                         custom_setattr(obj, attr, val)
 
@@ -69,7 +76,7 @@ class Utils(object):
                         new_dict = dict()
 
                         for key, value in six.iteritems(dictionary):
-                            val = Utils.deserialize(value, attr_type)
+                            val = Utils.deserialize(value, attr_type, extendAttributes)
                             new_dict[key] = val
 
                         custom_setattr(obj, attr, new_dict)

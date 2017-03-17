@@ -65,7 +65,7 @@ class UserGroupsClient(ApiClient):
         response = ApiClient.get_path(self, '/{0}'.format(gid))
         return Utils.deserialize(response.text, UserGroup)
 
-    def get_group_users(self, gid):
+    def get_group_users(self, gid, extended_attribute=None):
         """Get the users of a group
 
         :param gid: the group id
@@ -73,7 +73,7 @@ class UserGroupsClient(ApiClient):
         :rtype: User
         """
         response = ApiClient.get_path(self, '/{0}/users'.format(gid))
-        return Utils.deserialize(response.text, User)
+        return Utils.deserialize(response.text, User, extended_attribute)
 
     def update_group(self, group):
         """Update a group
