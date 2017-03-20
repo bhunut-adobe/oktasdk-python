@@ -27,7 +27,7 @@ class UsersClient(ApiClient):
         """
         params = {
             'limit': limit,
-            'q': query,
+            'query': query,
             'filter': filter_string
         }
         response = ApiClient.get_path(self, '/', params=params)
