@@ -61,15 +61,69 @@ class UserGroupsClient(ApiClient):
         response = ApiClient.get_path(self, '/{0}'.format(gid))
         return Utils.deserialize(response.text, UserGroup)
 
-    def get_group_users(self, gid, extended_attribute=None):
+    def get_group_users(self, gid, limit=None, extended_attribute=None):
         """Get the users of a group
 
         :param gid: the group id
         :type gid: str
+        :param limit: maximum number of users to return
+        :type limit: int or None
+        :param extended_attribute: dict of property name and type {'city':str}
+        :type extended_attribute: dict or None
         :rtype: User
         """
-        response = ApiClient.get_path(self, '/{0}/users'.format(gid))
+        params = {
+            'limit': limit
+        }
+        response = ApiClient.get_path(self, '/{0}/users'.format(gid), params=params)
+
         return Utils.deserialize(response.text, User, extended_attribute)
+
+    def get_paged_group_users(self, gid, limit=None, after=None, url=None):
+        """Get a paged list of Users from a Group
+
+        :param gid: the group id
+        :type gid: str
+        :param limit: maximum number of users to return
+        :type limit: int or None
+        :param after: user id that filtering will resume after
+        :type after: str
+        :param url: url that returns a list of User
+        :type url: str
+        :rtype: PagedResults of User
+        """
+        if url:
+            response = ApiClient.get(self, url)
+        else:
+            params = {
+                'limit': limit,
+                'after': after
+            }
+            response = ApiClient.get_path(self, '/{0}/users'.format(gid), params=params)
+
+        return PagedResults(response, User)
+
+    def get_group_all_users(self,gid, extended_attribute=None):
+        """Get all the user in a group
+
+        :param gid: the group id
+        :type gid: str
+        :param extended_attribute: dict of property name and type {'city':str}
+        :type extended_attribute: dict or None
+        :rtype: list of User
+        """
+        totalResults = []
+        nextUrl = None
+
+        while True:
+            results = self.get_paged_group_users(gid=gid, url=nextUrl)
+            totalResults.extend(results.result(extended_attribute=extended_attribute))
+            if not results.is_last_page():
+                nextUrl = results.next_url
+            else:
+                break
+
+        return totalResults
 
     def update_group(self, group):
         """Update a group

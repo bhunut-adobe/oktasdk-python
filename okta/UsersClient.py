@@ -23,6 +23,8 @@ class UsersClient(ApiClient):
         :type query: str or None
         :param filter_string: string to filter users
         :type filter_string: str or None
+        :param extended_attribute: dict of property name and type {'city':str}
+        :type extended_attribute: dict or None
         :rtype: list of User
         """
         params = {
@@ -38,6 +40,8 @@ class UsersClient(ApiClient):
 
         :param uid: the user id or login
         :type uid: str
+        :param extended_attribute: dict of property name and type {'city':str}
+        :type extended_attribute: dict or None
         :rtype: User
         """
         response = ApiClient.get_path(self, '/{0}'.format(uid))
@@ -92,11 +96,13 @@ class UsersClient(ApiClient):
         response = ApiClient.delete_path(self, '/{0}'.format(uid))
         return Utils.deserialize(response.text, User)
 
-    def get_paged_users(self, limit=None, filter_string=None, after=None, url=None):
+    def get_paged_users(self, limit=None, query=None, filter_string=None, after=None, url=None):
         """Get a paged list of Users
 
         :param limit: maximum number of users to return
         :type limit: int or None
+        :param query: string to search users' first names, last names, and emails
+        :type query: str or None
         :param filter_string: string to filter users
         :type filter_string: str or None
         :param after: user id that filtering will resume after
@@ -110,11 +116,36 @@ class UsersClient(ApiClient):
         else:
             params = {
                 'limit': limit,
+                'search': query,
                 'after': after,
                 'filter': filter_string
             }
             response = ApiClient.get_path(self, '/', params=params)
         return PagedResults(response, User)
+
+    def get_all_users(self, query=None, filter_string=None, extended_attribute=None):
+        """Get a paged list of Users
+
+        :param query: string to search users' first names, last names, and emails
+        :type query: str or None
+        :param filter_string: string to filter users
+        :type filter_string: str or None
+        :param extended_attribute: dict of property name and type {'city':str}
+        :type extended_attribute: dict or None
+        :rtype: list of User
+        """
+        totalResults = []
+        nextUrl = None
+
+        while True:
+            results = self.get_paged_users(query=query, filter_string=filter_string, url=nextUrl)
+            totalResults.extend(results.result(extended_attribute=extended_attribute))
+            if not results.is_last_page():
+                nextUrl = results.next_url
+            else:
+                break
+
+        return totalResults
 
     # LIFECYCLE
     

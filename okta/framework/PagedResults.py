@@ -20,6 +20,5 @@ class PagedResults(object):
     def next_url(self):
         return self.response.links.get("next").get("url")
 
-    @property
-    def result(self):
-        return Utils.deserialize(self.response.text, self.__target_class)
+    def result(self, extended_attribute=None):
+        return Utils.deserialize(self.response.text, self.__target_class, extendAttributes=extended_attribute)
