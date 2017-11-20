@@ -103,7 +103,7 @@ class UserGroupsClient(ApiClient):
 
         return PagedResults(response, User)
 
-    def get_group_all_users(self,gid, extended_attribute=None):
+    def get_group_all_users(self, gid, extended_attribute=None):
         """Get all the user in a group
 
         :param gid: the group id
@@ -112,18 +112,18 @@ class UserGroupsClient(ApiClient):
         :type extended_attribute: dict or None
         :rtype: list of User
         """
-        totalResults = []
-        nextUrl = None
+        total_results = []
+        next_url = None
 
         while True:
-            results = self.get_paged_group_users(gid=gid, url=nextUrl)
-            totalResults.extend(results.result(extended_attribute=extended_attribute))
+            results = self.get_paged_group_users(gid=gid, url=next_url)
+            total_results.extend(results.result(extended_attribute=extended_attribute))
             if not results.is_last_page():
-                nextUrl = results.next_url
+                next_url = results.next_url
             else:
                 break
 
-        return totalResults
+        return total_results
 
     def update_group(self, group):
         """Update a group
